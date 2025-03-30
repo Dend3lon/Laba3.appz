@@ -11,8 +11,6 @@ namespace Laba3.appz
         static List<Device> devices = new List<Device>();
         static void Main(string[] args)
         {
-            var sub = new Subscriber();
-
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             while (true)
             {
@@ -24,8 +22,6 @@ namespace Laba3.appz
                 {
                     case "1":
                         CreateDevice();
-                        foreach (var device in devices)
-                            sub.AddSub(device);
                         break;
                     case "2":
                         EditDevice();
@@ -59,15 +55,20 @@ namespace Laba3.appz
             bool network = bool.Parse(Console.ReadLine());
             Console.Write("Є гарнітура? (true/false): ");
             bool headphones = bool.Parse(Console.ReadLine());
+            Device device;
             if (type == 1)
-                devices.Add(new Computer(name, powered, software, network, headphones));
+                device = new Computer(name, powered, software, network, headphones);
             else if (type == 2)
             {
                 Console.Write("Заряд батареї: ");
                 int battery = int.Parse(Console.ReadLine());
-                devices.Add(new Smartphone(name, powered, software, network, headphones, battery));
+                device = new Smartphone(name, powered, software, network, headphones, battery);
             }
             else { return; }
+            devices.Add(device);
+
+            var observer = new StateReporter($"Спостерігач для {device.Name}");
+            device.Subscribe(observer);
         }
 
         static void EditDevice()

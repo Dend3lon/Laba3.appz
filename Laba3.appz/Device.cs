@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Laba3.appz
 {
-    public abstract class Device
+    public abstract class Device : IObservable<string>
     {
         public string Name { get; set; }
         public bool IsPowered { get; set; }
@@ -21,6 +21,7 @@ namespace Laba3.appz
             IsSoftwareInstalled = isSoftwareInstalled;
             IsNetworkConnected = isNetworkConnected;
             HasHeadphones = hasHeadphones;
+            observers = new List<IObserver<string>>();
         }
 
         public event Action<string> OnStateChange;
@@ -29,6 +30,7 @@ namespace Laba3.appz
             IsPowered = true;
             OnStateChange?.Invoke($"{Name} підключено до енергомережі.");
         }
+
         public void DisconnectPower()
         {
             IsPowered = false;
@@ -98,5 +100,48 @@ namespace Laba3.appz
         public abstract void Use(List<string> actions);
 
         public abstract void DisplayDeviceInfo();
+
+        private List<IObserver<string>> observers;
+
+        public IDisposable Subscribe(IObserver<string> observer)
+        {
+            if (!observers.Contains(observer))
+            {
+                observers.Add(observer);
+                OnStateChange += observer.OnNext;
+            }
+            return new Unsubscriber(observers, observer, OnStateChange);
+        }
+
+        private class Unsubscriber : IDisposable
+        {
+            private List<IObserver<string>> _observers;
+            private IObserver<string> _observer;
+            private Action<string> _onStateChange;
+            public Unsubscriber(List<IObserver<string>> observers, IObserver<string> observer, Action<string> onStateChange)
+            {
+                this._observers = observers;
+                this._observer = observer;
+                _onStateChange = onStateChange;
+            }
+
+            public void Dispose()
+            {
+                if (_observer != null && _observers.Contains(_observer))
+                {
+                    _observers.Remove(_observer);
+                    _onStateChange -= _observer.OnNext;
+                }
+            }
+        }
+
+        public void EndTransmission()
+        {
+            foreach (var observer in observers.ToArray())
+                if (observers.Contains(observer))
+                    observer.OnCompleted();
+
+            observers.Clear();
+        }
     }
 }
