@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Laba3.appz
 {
@@ -45,27 +43,21 @@ namespace Laba3.appz
             Console.Clear();
             Console.Write("Тип (1 - ПК, 2 - Телефон): ");
             int type = int.Parse(Console.ReadLine());
-            Console.Write("Введіть назву пристрою: ");
-            string name = Console.ReadLine();
-            Console.Write("Підключено до енергоживлення? (true/false): ");
-            bool powered = bool.Parse(Console.ReadLine());
-            Console.Write("ПЗ встановлено? (true/false): ");
-            bool software = bool.Parse(Console.ReadLine());
-            Console.Write("Підключення до мережі? (true/false): ");
-            bool network = bool.Parse(Console.ReadLine());
-            Console.Write("Є гарнітура? (true/false): ");
-            bool headphones = bool.Parse(Console.ReadLine());
-            Device device;
+
+            DeviceFactory factory;
             if (type == 1)
-                device = new Computer(name, powered, software, network, headphones);
+                factory = new ComputerFactory();
             else if (type == 2)
+                factory = new SmartphoneFactory();
+            else
             {
-                Console.Write("Заряд батареї: ");
-                int battery = int.Parse(Console.ReadLine());
-                device = new Smartphone(name, powered, software, network, headphones, battery);
+                Console.WriteLine("Невідомий тип пристрою.");
+                return;
             }
-            else { return; }
+
+            Device device = factory.CreateDevice();
             devices.Add(device);
+            device.DisplayDeviceInfo();
 
             var observer = new StateReporter($"Спостерігач для {device.Name}");
             device.Subscribe(observer);

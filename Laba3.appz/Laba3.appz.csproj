@@ -45,11 +45,14 @@
   <ItemGroup>
     <Compile Include="Battery.cs" />
     <Compile Include="Computer.cs" />
+    <Compile Include="ComputerFactory.cs" />
     <Compile Include="Device.cs" />
+    <Compile Include="DeviceFactory.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Smartphone.cs" />
-    <Compile Include="Subscriber.cs" />
+    <Compile Include="SmartphoneFactory.cs" />
+    <Compile Include="StateReporter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
